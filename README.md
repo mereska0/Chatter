@@ -16,6 +16,7 @@ it just simply send messages from server-client to client
 - upgrade exception handling
 - multiple clients
 - remote clients(not on exact wifi)
+- ~fixing fckin bunch of bugs~
 - upgrade design
 
 
