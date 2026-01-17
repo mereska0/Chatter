@@ -1,9 +1,9 @@
 package server;
 
+import gui.Gui;
 import gui.TextInput;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.net.*;
 
@@ -14,31 +14,11 @@ public class Client {
 
     public static void main(String[] args) {
         Thread gui = new Thread(() -> {
-            SwingUtilities.invokeLater(() -> {
-                JFrame frame = new JFrame("Chatter");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setSize(900, 600);
-                frame.setLayout(new BorderLayout());
-                TextInput textInput = new TextInput();
-                frame.add(new JScrollPane(TextInput.textArea));
-
-                TextInput.setOnSendListener(e -> {
-                    String message = e.getActionCommand();
-                    String username = TextInput.getUserName();
-                    System.out.println("CLIENT [" + username + "]: " + message);
-
-                    if (out != null) {
-                        out.println("[" + username + "]: " + message);
-                    }
-                });
-
-                frame.setVisible(true);
-
-                synchronized(lock) {
-                    isDone = true;
-                    lock.notifyAll();
-                }
-            });
+            Gui.display();
+            synchronized(lock) {
+                isDone = true;
+                lock.notifyAll();
+            }
         });
 
         Thread main = new Thread(() -> {
@@ -53,42 +33,26 @@ public class Client {
             }
 
             try {
-                System.out.println("Подключаюсь к серверу...");
-                Socket socket = new Socket("type your ip...", 1234);
+                System.out.println("connecting...");
+                Socket socket = new Socket("your ip...", 1234);//
                 OutputStream outputStream = socket.getOutputStream();
                 out = new PrintWriter(outputStream, true);
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
-
-                System.out.println("Подключено к серверу");
-
-                String response = in.readLine();
-                if (response != null) {
-                    System.out.println("Получено от сервера: " + response);
-
-                    SwingUtilities.invokeLater(() -> {
-                        String senderName = "Server";
-                        String messageText = response;
-
-                        if (response.startsWith("[") && response.contains("]: ")) {
-                            int endIndex = response.indexOf("]: ");
-                            senderName = response.substring(1, endIndex);
-                            messageText = response.substring(endIndex + 3);
-                        }
-
-                        TextInput.appendResponse(senderName, messageText);
-                    });
-                }
+                System.out.println("connected");
+                TextInput.setOut(out);
+                out.println("New client connected!");
+                out.flush();
 
                 new Thread(() -> {
                     try {
                         String serverMessage;
                         while ((serverMessage = in.readLine()) != null) {
                             final String msg = serverMessage;
-                            System.out.println("Получено от сервера: " + msg);
+                            System.out.println("got from server: " + msg);
 
                             SwingUtilities.invokeLater(() -> {
-                                String senderName = "Server";
+                                String senderName = "System";
                                 String messageText = msg;
 
                                 if (msg.startsWith("[") && msg.contains("]: ")) {
@@ -101,9 +65,9 @@ public class Client {
                             });
                         }
                     } catch (IOException e) {
-                        System.out.println("Сервер отключился");
+                        System.out.println("server disconnected");
                         SwingUtilities.invokeLater(() -> {
-                            TextInput.appendResponse("System", "Сервер отключился");
+                            TextInput.appendResponse("System", "server disconnected");
                         });
                     }
                 }).start();
@@ -112,8 +76,8 @@ public class Client {
                 e.printStackTrace();
                 SwingUtilities.invokeLater(() -> {
                     JOptionPane.showMessageDialog(null,
-                            "Не удалось подключиться к серверу: " + e.getMessage(),
-                            "Ошибка подключения",
+                            "failed to connect: " + e.getMessage(),
+                            "error",
                             JOptionPane.ERROR_MESSAGE);
                 });
             }
