@@ -8,60 +8,53 @@ import java.io.*;
 import java.net.*;
 
 public class Client {
-    private static final Object lock = new Object();
-    static boolean isDone = false;
+
     private static PrintWriter out;
 
     public static void main(String[] args) {
-        Thread gui = new Thread(() -> {
-            Gui.display();
-            synchronized(lock) {
-                isDone = true;
-                lock.notifyAll();
-            }
-        });
-
+        Gui.display();
         Thread main = new Thread(() -> {
-            synchronized(lock) {
-                while (!isDone) {
-                    try {
-                        lock.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            try {
+            try {//connection to server
                 System.out.println("connecting...");
-                Socket socket = new Socket("your ip...", 1234);//
+                Socket socket = new Socket("192.168.1.49", 1234);//your ip...
                 OutputStream outputStream = socket.getOutputStream();
                 out = new PrintWriter(outputStream, true);
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
                 System.out.println("connected");
                 TextInput.setOut(out);
-                out.println("New client connected!");
+                while (!Gui.isNicknameSet()) {
+                    Thread.sleep(1000);
+                }
+                String senderName = Gui.getName();
+                out.println(senderName);
                 out.flush();
 
-                new Thread(() -> {
+                new Thread(() -> {//message handling
                     try {
                         String serverMessage;
                         while ((serverMessage = in.readLine()) != null) {
                             final String msg = serverMessage;
-                            System.out.println("got from server: " + msg);
+                            System.out.println("got: " + msg);
 
                             SwingUtilities.invokeLater(() -> {
-                                String senderName = "System";
+
                                 String messageText = msg;
-
+                                String sender = "";
                                 if (msg.startsWith("[") && msg.contains("]: ")) {
-                                    int endIndex = msg.indexOf("]: ");
-                                    senderName = msg.substring(1, endIndex);
-                                    messageText = msg.substring(endIndex + 3);
-                                }
+                                    int firstBracketEnd = msg.indexOf("]: ");
+                                    sender = msg.substring(1, firstBracketEnd);
+                                    if (firstBracketEnd != -1) {
+                                        int secondBracketStart = msg.indexOf("]: ", firstBracketEnd + 3);
 
-                                TextInput.appendResponse(senderName, messageText);
+                                        if (secondBracketStart != -1) {
+                                            messageText = msg.substring(secondBracketStart + 3);
+                                        } else {
+                                            messageText = msg.substring(firstBracketEnd + 3);
+                                        }
+                                    }
+                                }
+                                TextInput.appendResponse(sender, messageText);
                             });
                         }
                     } catch (IOException e) {
@@ -80,10 +73,10 @@ public class Client {
                             "error",
                             JOptionPane.ERROR_MESSAGE);
                 });
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         });
-
-        gui.start();
         main.start();
     }
 }

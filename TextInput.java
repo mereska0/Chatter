@@ -1,14 +1,15 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.plaf.TextUI;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.PrintWriter;
 
 public class TextInput extends JFrame {
-    static String username = "";
-    public static JTextArea textArea = new JTextArea(username + ">", 100, 90);
+    static String username;
+    public static JTextArea textArea = new JTextArea("press enter to start chatting..", 100, 90);
     private static ActionListener sendListener;
     private static PrintWriter out;
     public TextInput() {
@@ -19,6 +20,27 @@ public class TextInput extends JFrame {
         textArea.setBackground(Color.DARK_GRAY);
         textArea.setForeground(Color.green);
 
+        Caret Caret = new DefaultCaret() {
+            @Override
+            public void paint(Graphics g) {
+                if (isVisible()) {
+                    try {
+                        JTextComponent component = getComponent();
+                        TextUI mapper = component.getUI();
+                        Rectangle r = mapper.modelToView(component, getDot());
+                        g.setColor(Color.GREEN);
+                        g.fillRect(r.x, r.y, 2, r.height);
+                    } catch (BadLocationException e) {
+                        // ignore
+                    }
+                }
+            }
+        };
+
+        textArea.setCaret(Caret);
+        textArea.setCaretPosition(1);
+        Caret.setBlinkRate(500);
+
         textArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -26,9 +48,14 @@ public class TextInput extends JFrame {
                     e.consume();
                     String message = getCurrentInput();
                     if (!message.trim().isEmpty()) {
-                        if (username.isEmpty()) {
-                            username = message;
+                        while (!Gui.isNicknameSet()) {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
+                        String username = Gui.getName();
 
                         try {
                             Document doc = textArea.getDocument();
@@ -127,7 +154,7 @@ public class TextInput extends JFrame {
                     if (lineStart == -1) lineStart = 0;
                     else lineStart++;
 
-                    if (pos == lineStart + username.length()) {
+                    if (username != null && pos == lineStart + username.length()) {
                         return true;
                     }
                 }
@@ -165,21 +192,15 @@ public class TextInput extends JFrame {
         return "";
     }
 
-    public static String getUserName() {
-        if (username == null || username.isEmpty()) {
-            String currentInput = getCurrentInput().trim();
-            if (!currentInput.isEmpty()) {
-                username = currentInput;
-                System.out.println("TextInput: username is set: " + username);
-            }
-        }
-        return username != null ? username : "";
-    }
-
     public static void appendResponse(String name, String response) {
         if (textArea != null) {
             SwingUtilities.invokeLater(() -> {
-                textArea.append("\n" + name + ">" + response + "\n" + username + ">");
+                String currentUsername = Gui.getName();
+                if (currentUsername == null) {
+                    currentUsername = "User";
+                }
+                username = currentUsername;
+                textArea.append("\n" + name + ">" + response + "\n" + currentUsername + ">");
                 textArea.setCaretPosition(textArea.getDocument().getLength());
             });
         }
