@@ -5,6 +5,7 @@ for now only *Alpha version(0.0.2)*
 
 ### 🚀 Usage instructions
 to start you need to change ip in `Client.java`. then start `Server.java` on one device and `Client.java`(as much instances as you want).
+
 <img width="608" height="265" alt="изображение" src="https://github.com/user-attachments/assets/a9d562ac-5e59-430c-9c99-23d6d943660e" />
 
 ### 👥 User experience
