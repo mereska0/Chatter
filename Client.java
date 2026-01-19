@@ -16,7 +16,7 @@ public class Client {
         Thread main = new Thread(() -> {
             try {//connection to server
                 System.out.println("connecting...");
-                Socket socket = new Socket("your ip...", 1234);//
+                Socket socket = new Socket("your ip..", 1234);//
                 OutputStream outputStream = socket.getOutputStream();
                 out = new PrintWriter(outputStream, true);
                 BufferedReader in = new BufferedReader(
@@ -49,8 +49,9 @@ public class Client {
 
                                         if (secondBracketStart != -1) {
                                             messageText = msg.substring(secondBracketStart + 3);
-                                        } else {
-                                            messageText = msg.substring(firstBracketEnd + 3);
+                                            if (messageText.equals("/exit")){
+                                                Gui.closeWindow();
+                                            }
                                         }
                                     }
                                 }

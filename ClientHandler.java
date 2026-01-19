@@ -66,7 +66,7 @@ public class ClientHandler implements Runnable {
         try {
             while (socket.isConnected() && !socket.isClosed()) {
                 message = reader.readLine();
-                if (message == null || message.equalsIgnoreCase("/exit")) {
+                if (message == null) {
                     break;
                 }
                 String formattedMessage = "[" + username + "]: " + message;

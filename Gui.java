@@ -54,6 +54,13 @@ public class Gui {
             ActionListener confirmAction = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    confirmButton.setBackground(Color.GREEN);
+                    try {
+                        Thread.sleep(100);
+                        confirmButton.setBackground(Color.DARK_GRAY);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     username = nicknameField.getText().trim();
                     isNicknameSet = true;
                     if (!username.isEmpty()) {
@@ -93,4 +100,8 @@ public class Gui {
     public static boolean isNicknameSet(){
         return isNicknameSet;
     }
+    public static void closeWindow(){
+        frame.dispose();
+    }
 }
+//TODO separate inputArea and respondArea

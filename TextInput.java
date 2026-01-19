@@ -19,27 +19,8 @@ public class TextInput extends JFrame {
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
         textArea.setBackground(Color.DARK_GRAY);
         textArea.setForeground(Color.green);
-
-        Caret Caret = new DefaultCaret() {
-            @Override
-            public void paint(Graphics g) {
-                if (isVisible()) {
-                    try {
-                        JTextComponent component = getComponent();
-                        TextUI mapper = component.getUI();
-                        Rectangle r = mapper.modelToView(component, getDot());
-                        g.setColor(Color.GREEN);
-                        g.fillRect(r.x, r.y, 2, r.height);
-                    } catch (BadLocationException e) {
-                        // ignore
-                    }
-                }
-            }
-        };
-
-        textArea.setCaret(Caret);
+        textArea.setCaretColor(Color.GREEN);
         textArea.setCaretPosition(1);
-        Caret.setBlinkRate(500);
 
         textArea.addKeyListener(new KeyAdapter() {
             @Override
