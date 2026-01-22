@@ -3,6 +3,7 @@ package gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.im.InputContext;
 import java.io.PrintWriter;
 
 public class Gui {
@@ -97,11 +98,10 @@ public class Gui {
     public static String getName() {
         return username;
     }
+    public static void setName(String name){username = name;}
     public static boolean isNicknameSet(){
         return isNicknameSet;
     }
-    public static void closeWindow(){
-        frame.dispose();
-    }
+    public static JFrame getFrame() {return frame;}
 }
 //TODO separate inputArea and respondArea
