@@ -15,6 +15,10 @@ ______________________________________________________________________
 
 *Now you can use commands(without <>)!*
 
+`/help - command instruction`
+
+`/users - all users online`
+
 `/exit - close app`
 
 `/setname <name> - change username`
