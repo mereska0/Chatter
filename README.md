@@ -13,13 +13,13 @@ it just simply send messages between several clients
 
 ______________________________________________________________________
 
-*Now you can use commands!*
+*Now you can use commands(without <>)!*
 
 `/exit - close app`
 
-`/setname - change username`
+`/setname <name> - change username`
 
-`/private <user> <text>(without <>) - send private message to user`
+`/private <user> <text> - send private message to user`
 
 ________________________________________________________________________
 

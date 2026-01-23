@@ -1,7 +1,5 @@
 package server;
 
-import gui.Gui;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -97,7 +95,7 @@ public class ClientHandler implements Runnable {
                 }else if (message.contains("/setname")){
                     writer.println(message);
                     writer.flush();
-                    Thread.sleep(400);
+                    Thread.sleep(200);
                     username = message.substring(username.length() + 13);
                 }else if (message.contains("/private")){
                     String[] arr = message.split(" ");

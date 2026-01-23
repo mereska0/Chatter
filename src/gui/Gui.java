@@ -105,3 +105,4 @@ public class Gui {
     public static JFrame getFrame() {return frame;}
 }
 //TODO separate inputArea and respondArea
+//TODO JavaFX

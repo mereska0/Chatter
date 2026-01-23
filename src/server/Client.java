@@ -86,4 +86,4 @@ public class Client {
         });
         main.start();
     }
-}
+}//TODO clear fckn code
