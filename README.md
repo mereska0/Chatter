@@ -1,7 +1,7 @@
 # >Chatter
 Messenger in retro style
 ## ℹ️ Version
-for now only *Alpha version(0.0.3)*
+for now only **Beta version(0.1.0)**
 
 ### 🚀 Usage instructions
 to start you need to change ip in `Client.java`. then start `Server.java` on one device and `Client.java`(as much instances as you want).
@@ -28,7 +28,9 @@ ______________________________________________________________________
 ________________________________________________________________________
 
 *for now it's full of bugs, so there are enough things to deal with :)*
-<img width="629" height="311" alt="изображение" src="https://github.com/user-attachments/assets/d98bcf7a-6663-4662-b2a6-246eebd03ebb" />
+<img width="700" height="400" alt="изображение" src="https://github.com/user-attachments/assets/f3c40973-e6db-4bb3-9804-20c91b979768" />
+
+<img width="700" height="400" alt="изображение" src="https://github.com/user-attachments/assets/0e791bbd-993b-4d5b-939c-5e69e646dfbc" />
 
 ## 🎖️Future plans
 - upgrade exception handling
