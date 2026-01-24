@@ -11,10 +11,15 @@ import javafx.stage.Stage;
 
 public class StartPage extends Application {
 private static String username = "";
+private static String chatId = "";
     TextField nameField = new TextField();
+    TextField IdField = new TextField();
 public static String getName(){
     return username;
 }
+    public static String getChatId(){
+        return chatId;
+    }
 public static void setName(String name){
     username = name;
 }
@@ -92,7 +97,6 @@ public static boolean isNicknameSet(){
         Label IdLabel = new Label("Chat name/id:");
         IdLabel.setFont(font);
         IdLabel.getStyleClass().add("input-label");
-        TextField IdField = new TextField();
         IdField.setFont(font);
         IdField.setPromptText("type chat name..");
         IdField.getStyleClass().add("text-field");
@@ -125,6 +129,7 @@ public static boolean isNicknameSet(){
         saveButton.setOnAction(e -> {
             try {
                 username = nameField.getText();
+                chatId = IdField.getText();
                 Stage chatStage = new Stage();
                 Chat chat = new Chat();
                 chat.start(chatStage);

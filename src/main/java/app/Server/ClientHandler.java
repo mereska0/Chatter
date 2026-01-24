@@ -26,8 +26,6 @@ public class ClientHandler implements Runnable {
 
             clientHandlers.add(this);
             broadcastToAll("[SERVER] " + username + " connected!");
-
-            writer.println("[SERVER] Hi, " + username + "!");
             writer.println("[SERVER] Online: " + getOnlineUsers());
 
             System.out.println(username + " connected");

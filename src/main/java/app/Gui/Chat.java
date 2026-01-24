@@ -131,7 +131,7 @@ public class Chat extends Application {
         chatPanel.setAlignment(Pos.TOP_LEFT);
         chatPanel.getStyleClass().add("form-panel");
 
-        Label chatLabel = new Label("Chat: #general");
+        Label chatLabel = new Label("Chat: #" + StartPage.getChatId());
         chatLabel.setFont(font);
         chatLabel.getStyleClass().add("input-label");
 
