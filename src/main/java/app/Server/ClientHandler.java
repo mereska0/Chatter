@@ -165,8 +165,7 @@ public class ClientHandler implements Runnable {
                     writer.println("[SERVER] /setname <name> - change username");
                     writer.println("[SERVER] /private <name> <text> - private message to user");
                     writer.println("[SERVER] /exit - leave the chat");
-                }
-                else {
+                } else {
                     String formattedMessage = "[" + username + "]: " + message;
                     broadcastToAll(formattedMessage);
                 }

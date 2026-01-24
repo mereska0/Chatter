@@ -1,5 +1,6 @@
 package app.Gui;
 
+import app.Server.Server;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,8 +18,8 @@ private static String chatId = "";
 public static String getName(){
     return username;
 }
-    public static String getChatId(){
-        return chatId;
+    public static int getChatId(){
+        return Math.abs(chatId.hashCode() % 10000);
     }
 public static void setName(String name){
     username = name;
