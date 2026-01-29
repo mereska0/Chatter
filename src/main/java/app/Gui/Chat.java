@@ -18,15 +18,18 @@ import javafx.stage.Stage;
 import java.io.PrintWriter;
 
 public class Chat extends Application {
+    private final String chatId;
     private BorderPane root;
     private TextArea chatHistoryArea;
     private TextArea inputArea;
     private PrintWriter serverOut;
-    private static Chat instance;
+
+    public Chat(String chatId) {
+        this.chatId = chatId;
+    }
 
     @Override
     public void start(Stage stage) {
-        instance = this;
         Client.setChatInstance(this);
         serverOut = Client.getServerWriter();
         root = new BorderPane();
@@ -131,7 +134,7 @@ public class Chat extends Application {
         chatPanel.setAlignment(Pos.TOP_LEFT);
         chatPanel.getStyleClass().add("form-panel");
 
-        Label chatLabel = new Label("Chat: #" + StartPage.getChatId());
+        Label chatLabel = new Label("Chat: #" + Math.abs(chatId.hashCode()%10000));
         chatLabel.setFont(font);
         chatLabel.getStyleClass().add("input-label");
 

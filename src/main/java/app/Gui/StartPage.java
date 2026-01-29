@@ -18,9 +18,6 @@ private static String chatId = "";
 public static String getName(){
     return username;
 }
-    public static int getChatId(){
-        return Math.abs(chatId.hashCode() % 10000);
-    }
 public static void setName(String name){
     username = name;
 }
@@ -49,19 +46,15 @@ public static boolean isNicknameSet(){
         topPanel.getStyleClass().add("top-panel");
         root.setTop(topPanel);
 
-        // === ЦЕНТРАЛЬНАЯ ПАНЕЛЬ - ФОРМА ===
         VBox centerPanel = createFormPanel();
         root.setCenter(centerPanel);
 
-        // === НИЖНЯЯ ПАНЕЛЬ - КНОПКИ ===
         HBox bottomPanel = createButtonPanel();
         root.setBottom(bottomPanel);
 
-        // === СЦЕНА И СТИЛИ ===
         Scene scene = new Scene(root, 1200, 700);
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
 
-        // Настройка главного окна
         primaryStage.setTitle("Chatter");
         primaryStage.setScene(scene);
         primaryStage.setResizable(true);
@@ -78,14 +71,12 @@ public static boolean isNicknameSet(){
         formPanel.setAlignment(Pos.TOP_CENTER);
         formPanel.getStyleClass().add("form-panel");
 
-        // Группа полей ввода
         GridPane inputGrid = new GridPane();
         inputGrid.setHgap(15);
         inputGrid.setVgap(15);
         inputGrid.setPadding(new Insets(20));
         inputGrid.getStyleClass().add("input-grid");
 
-        // Поле 1: Имя
         Label nameLabel = new Label("NAME:");
         nameLabel.setFont(font);
         nameLabel.getStyleClass().add("input-label");
@@ -102,14 +93,10 @@ public static boolean isNicknameSet(){
         IdField.setPromptText("type chat name..");
         IdField.getStyleClass().add("text-field");
 
-
-        // Добавляем элементы в сетку
         inputGrid.add(nameLabel, 0, 0);
         inputGrid.add(nameField, 1, 0);
         inputGrid.add(IdLabel, 0, 2);
         inputGrid.add(IdField, 1, 2);
-
-
 
         formPanel.getChildren().add(inputGrid);
 
@@ -122,7 +109,6 @@ public static boolean isNicknameSet(){
         buttonPanel.setPadding(new Insets(25));
         buttonPanel.getStyleClass().add("button-panel");
 
-        // Кнопка Сохранить
         Button saveButton = new Button("Start chatting");
         saveButton.getStyleClass().add("save-button");
         saveButton.setPrefSize(300, 40);
@@ -132,7 +118,7 @@ public static boolean isNicknameSet(){
                 username = nameField.getText();
                 chatId = IdField.getText();
                 Stage chatStage = new Stage();
-                Chat chat = new Chat();
+                Chat chat = new Chat(chatId);
                 chat.start(chatStage);
                 ((Stage) saveButton.getScene().getWindow()).close();
             } catch (Exception ex) {

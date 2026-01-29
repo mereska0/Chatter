@@ -165,7 +165,20 @@ public class ClientHandler implements Runnable {
                     writer.println("[SERVER] /setname <name> - change username");
                     writer.println("[SERVER] /private <name> <text> - private message to user");
                     writer.println("[SERVER] /exit - leave the chat");
-                } else {
+                } else if (message.contains("/create ")){
+                    writer.println(message);
+                    Server.startNewServer(message.substring(8).hashCode()%10000);
+                    broadcastToAll(username + " has disconnected");
+                }else if (message.contains("/connect ")){
+                    removeClientHandler();
+                    int port =Math.abs(message.substring(9).hashCode()%10000);
+                    if (Server.ports.contains(port)){
+                        writer.println(message);
+                        broadcastToAll(username + " has disconnected");
+                    }else{
+                        writer.println("SERVER: " + message.substring(9) +" chat doesn't exist");
+                    }
+                }else {
                     String formattedMessage = "[" + username + "]: " + message;
                     broadcastToAll(formattedMessage);
                 }

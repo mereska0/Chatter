@@ -4,14 +4,17 @@ import app.Gui.Chat;
 import app.Gui.StartPage;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.Socket;
 
 public class Client {
     private static PrintWriter out;
-    private static Chat chatInstance;
-
+    private static Chat chat;
+    private static Socket socket;
+    private static Thread mainThread;
+    private static BufferedReader mainIn;
     public static void main(String[] args) throws InterruptedException {
         Thread guiThread = new Thread(() -> {
             Application.launch(StartPage.class, args);
@@ -23,11 +26,11 @@ public class Client {
         Thread serverThread = new Thread(() -> {
             try {
                 System.out.println("connecting...");
-                Socket socket = new Socket("localhost", 1234);
+                socket = new Socket("localhost", 1234);
                 OutputStream outputStream = socket.getOutputStream();
                 out = new PrintWriter(outputStream, true);
 
-                BufferedReader in = new BufferedReader(
+                mainIn = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
 
                 System.out.println("Connected successfully");
@@ -40,27 +43,31 @@ public class Client {
                 out.println(senderName);
                 out.flush();
 
-                new Thread(() -> {
+                mainThread = new Thread(() -> {
                     try {
                         String serverMessage;
-                        while ((serverMessage = in.readLine()) != null) {
+                        while ((serverMessage = mainIn.readLine()) != null) {
                             final String msg = serverMessage;
                             System.out.println("got: " + msg);
 
                             Platform.runLater(() -> {
-                                processServerMessage(msg);
+                                try {
+                                    processServerMessage(msg);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
                             });
                         }
                     } catch (IOException e) {
                         System.out.println("server disconnected");
                         Platform.runLater(() -> {
-                            if (chatInstance != null) {
-                                chatInstance.appendMessage("SYSTEM", "Server disconnected");
+                            if (chat != null) {
+                                chat.appendMessage("SYSTEM", "Server disconnected");
                             }
                         });
                     }
-                }).start();
-
+                });
+                mainThread.start();
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
                 Platform.runLater(() -> {
@@ -71,11 +78,11 @@ public class Client {
         serverThread.start();
     }
 
-    private static void processServerMessage(String message) {
+    private static void processServerMessage(String message) throws IOException {
         if (message.contains("CMD_CLOSE_WINDOW")) {
             Platform.runLater(() -> {
-                if (chatInstance != null) {
-                    chatInstance.close();
+                if (chat != null) {
+                    chat.close();
                 }
             });
             return;
@@ -84,6 +91,65 @@ public class Client {
         if (message.contains("/setname")) {
             String username = message.substring("/setname ".length());
             StartPage.setName(username);
+            return;
+        }
+
+        if (message.contains("/create ") || message.contains("/connect")) {
+            int port = 0;
+            if (message.contains("/create ")){port =Math.abs(message.substring(8).hashCode() % 10000);}
+            if (message.contains("/connect ")){port =Math.abs(message.substring(9).hashCode() % 10000);}
+            mainThread.interrupt();
+            socket.close();
+            int finalPort = port;
+            Platform.runLater(() -> {
+                try {
+                    if (chat != null) {
+                        chat.close();
+                    }
+                    Stage chatStage = new Stage();
+                    Chat newChat = new Chat(finalPort + "");
+                    newChat.start(chatStage);
+                    chat = newChat;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+            try {
+                mainIn.close();
+                Socket NewSocket = new Socket("localhost", port);
+                OutputStream outputStream = NewSocket.getOutputStream();
+                PrintWriter Newout = new PrintWriter(outputStream, true);
+
+                BufferedReader NewIn = new BufferedReader(
+                        new InputStreamReader(NewSocket.getInputStream()));
+                System.out.println("Connected to port " + port);
+
+                new Thread(() -> {
+                    try {
+                        String serverMessage;
+                        while ((serverMessage = NewIn.readLine()) != null) {
+                            final String msg = serverMessage;
+                            Platform.runLater(() -> {
+                                try {
+                                    processServerMessage(msg);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Disconnected from port " + finalPort);
+                    }
+                }).start();
+
+                Newout.println(StartPage.getName());
+                Newout.flush();
+
+            } catch (IOException e) {
+                System.err.println("Failed to connect to port " + port + ": " + e.getMessage());
+            }
             return;
         }
         String sender = "";
@@ -95,12 +161,13 @@ public class Client {
             messageText = message.substring(bracketEnd + 3);
         }
 
-        if (chatInstance != null) {
-            chatInstance.appendMessage(sender, messageText);
+        if (chat != null) {
+            chat.appendMessage(sender, messageText);
         }
     }
+
     public static void setChatInstance(Chat chat) {
-        chatInstance = chat;
+        Client.chat = chat;
     }
 
     public static PrintWriter getServerWriter() {
