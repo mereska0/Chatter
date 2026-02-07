@@ -1,4 +1,5 @@
 # >/Chatter
+*in progress...*
 Messenger with terminal and commands in fancy retro style!
 ## ℹ️ Version
 for now only **Beta version(0.1.0)**
